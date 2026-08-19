@@ -28,6 +28,7 @@ sum_sq_diff = np.sum(sq_diff, axis=2)
 distance_matrix = np.sqrt(sum_sq_diff)
 
 # Step 3
+#
 cutoff = 8.0
 
 contact_map = (distance_matrix <= cutoff).astype(int)
@@ -42,3 +43,43 @@ np.fill_diagonal(kirchhoff, degrees)
 
 print(f"Kirchhoff matrix shape: {kirchhoff.shape}")
 print(f"Sample diagonal (connections per atom): {degrees[:5]}")
+
+x_coords = ca_matrix[:, 0]
+y_coords = ca_matrix[:, 1]
+z_coords = ca_matrix[:, 2]
+
+fig = plt.figure(figsize=(10, 10))
+ax = fig.add_subplot(111, projection="3d")
+
+ax.scatter(
+    x_coords,
+    y_coords,
+    z_coords,
+    c="teal",
+    marker="o",
+    s=30,
+    alpha=0.8,
+)
+
+# Indices where a spring exists (contact_map == 1)
+sources, targets = np.nonzero(contact_map)
+
+for src, tgt in zip(sources, targets):
+    if src < tgt:
+        ax.plot(
+            [x_coords[src], x_coords[tgt]],
+            [y_coords[src], y_coords[tgt]],
+            [z_coords[src], z_coords[tgt]],
+            color="gray",
+            alpha=0.3,
+            linewidth=0.5,
+        )
+
+ax.set_title(f"1AKI: 3D Elastic Network Model (Cutoff: {cutoff}Å)", fontsize=14)
+ax.set_xlabel("X (Å)")
+ax.set_ylabel("Y (Å)")
+ax.set_zlabel("Z (Å)")
+
+ax.grid(False)
+
+plt.show()
