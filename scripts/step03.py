@@ -28,7 +28,22 @@ sum_sq_diff = np.sum(sq_diff, axis=2)
 distance_matrix = np.sqrt(sum_sq_diff)
 
 # Step 3
-#
+
+"""
+To build the Elastic Network, we apply a distance cutoff (e.g., $d \\leq 8$ Å).
+- If the distance between i and j is less than the threshold, we have a connection.
+
+Mathematically, this is equivalent to applying a binary mask or a threshold to a tensor in DL.
+- The result is an adjacency matrix/contact map.
+
+To calculate the physics later, we need to transform the map into a Kirchhoff Matrix.
+
+The Kirchhoff/Hessian Matrix ($\\Gamma$) is defined such that:
+- $\\Gamma_{ij}, \forall i \neq j$: If $d_{ij} \\leq 8$, -1; otherwise, 0
+- $\\Gamma_{ii}$: Represents the degree (number of connections);
+  $$\\Gamma_{ii} = \\sum_{j\neq i} | \\Gamma_{ij} |$$
+"""
+
 cutoff = 8.0
 
 contact_map = (distance_matrix <= cutoff).astype(int)
