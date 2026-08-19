@@ -68,10 +68,8 @@ $$\\Delta R_i^2 \\propto \\sum_{k=2}^{N} \frac{V_{ik}^2}{\\lambda_k}$$
   - (the entire protein translating in space without changing shape)
 """
 
-# Eigendecomposition of the Kirchhoff Matrix
 eigenvalues, eigenvectors = np.linalg.eigh(kirchhoff)
 
-# Optional: Ensure they are sorted from lowest to highest
 idx = eigenvalues.argsort()
 eigenvalues = eigenvalues[idx]
 eigenvectors = eigenvectors[:, idx]
@@ -82,3 +80,23 @@ non_zero_evecs = eigenvectors[:, 1:]
 fluctuations = np.sum((non_zero_evecs**2) / non_zero_evals, axis=1)
 
 print(f"Calculated fluctuations for {len(fluctuations)} atoms.")
+
+fig, ax = plt.subplots(figsize=(10, 4))
+
+ax.plot(
+    range(1, len(fluctuations) + 1),
+    fluctuations,
+    color="coral",
+    linewidth=2,
+    marker="o",
+    markersize=3,
+)
+
+ax.set_title(
+    "1AKI: Theoretical Atom Fluctuations (Gaussian Network Model)", fontsize=14
+)
+ax.set_xlabel("Residue Index")
+ax.set_ylabel("Mean Square Fluctuation (Theoretical)")
+ax.grid(True, linestyle="--", alpha=0.6)
+
+plt.show()
