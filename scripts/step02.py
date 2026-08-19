@@ -19,10 +19,6 @@ with open("data/1AKI.pdb", "r") as file:
 
 ca_matrix = np.array(coordinates)
 
-x_coords = ca_matrix[:, 0]
-y_coords = ca_matrix[:, 1]
-z_coords = ca_matrix[:, 2]
-
 # Step 2
 
 """
@@ -54,3 +50,18 @@ sum_sq_diff = np.sum(sq_diff, axis=2)  # sum along the coordinate axis -> (129, 
 distance_matrix = np.sqrt(sum_sq_diff)
 
 print(f"Distance matrix shape: {distance_matrix.shape}")  # (129, 129)
+
+# 3. Visualize the Distance Matrix
+fig, ax = plt.subplots(figsize=(7, 7))
+
+# Plot the matrix. The diagonal will be 0 (an atom is 0 distance from itself)
+cax = ax.imshow(distance_matrix, cmap="viridis_r")
+
+cbar = fig.colorbar(cax, shrink=0.8)
+cbar.set_label("Distance in Ångströms", rotation=270, labelpad=15)
+
+ax.set_title("1AKI: Distance Matrix Heatmap")
+ax.set_xlabel("Atom Index (j)")
+ax.set_ylabel("Atom Index (i)")
+
+plt.show()
