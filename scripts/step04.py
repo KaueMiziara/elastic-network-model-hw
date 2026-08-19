@@ -42,3 +42,43 @@ degrees = np.sum(contact_map, axis=1)
 np.fill_diagonal(kirchhoff, degrees)
 
 # Step 4
+
+"""
+We'll perform Normal Mode Analysis (NMA) using the Gaussian Network Model (GNM).
+
+To extract the physical movements from the network, we decompose the Kirchhoff matrix. 
+- Mathematically, it's identical to finding the principal components in a DL dataset to reduce dimensionality: 
+  - we want to find the dominant axes of variance. 
+- In physics, these axes are the natural vibrations of the protein.
+  - We do this using Eigendecomposition.
+
+When we decompose the Kirchhoff matrix ($K$), we get two things:
+- Eigenvalues ($\\lambda$): represent the stiffness or frequency of a specific motion. 
+  - Lower values mean large, slow, global movements. 
+  - Higher values mean fast, stiff, localized vibrations.
+- Eigenvectors ($V$): These are the actual "modes" or shapes of the movement.
+
+The mean-square fluctuation ($\\Delta R_i^2$) of each atom are, essentially, how flexible that part of the protein is
+ - it's inversely proportional to the eigenvalues.
+ - We sum up the contributions of all the modes to get the total flexibility (often called theoretical B-factors):
+
+$$\\Delta R_i^2 \\propto \\sum_{k=2}^{N} \frac{V_{ik}^2}{\\lambda_k}$$
+
+- We start the sum at $k=2$ because the first eigenvalue is always 0
+  - (the entire protein translating in space without changing shape)
+"""
+
+# Eigendecomposition of the Kirchhoff Matrix
+eigenvalues, eigenvectors = np.linalg.eigh(kirchhoff)
+
+# Optional: Ensure they are sorted from lowest to highest
+idx = eigenvalues.argsort()
+eigenvalues = eigenvalues[idx]
+eigenvectors = eigenvectors[:, idx]
+
+non_zero_evals = eigenvalues[1:]
+non_zero_evecs = eigenvectors[:, 1:]
+
+fluctuations = np.sum((non_zero_evecs**2) / non_zero_evals, axis=1)
+
+print(f"Calculated fluctuations for {len(fluctuations)} atoms.")
