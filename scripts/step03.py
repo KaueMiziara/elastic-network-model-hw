@@ -28,3 +28,17 @@ sum_sq_diff = np.sum(sq_diff, axis=2)
 distance_matrix = np.sqrt(sum_sq_diff)
 
 # Step 3
+cutoff = 8.0
+
+contact_map = (distance_matrix <= cutoff).astype(int)
+
+np.fill_diagonal(contact_map, 0)
+
+kirchhoff = -1 * contact_map
+
+degrees = np.sum(contact_map, axis=1)
+
+np.fill_diagonal(kirchhoff, degrees)
+
+print(f"Kirchhoff matrix shape: {kirchhoff.shape}")
+print(f"Sample diagonal (connections per atom): {degrees[:5]}")
