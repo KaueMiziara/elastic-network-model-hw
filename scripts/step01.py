@@ -31,3 +31,36 @@ ca_matrix = np.array(coordinates)
 
 print(f"Extracted {ca_matrix.shape[0]} C-alpha atoms.")
 print(f"Array shape: {ca_matrix.shape}")  # 1AKI: (129, 3)
+
+fig = plt.figure(figsize=(8, 8))
+ax = fig.add_subplot(111, projection="3d")
+
+x_coords = ca_matrix[:, 0]
+y_coords = ca_matrix[:, 1]
+z_coords = ca_matrix[:, 2]
+
+ax.scatter(
+    x_coords,
+    y_coords,
+    z_coords,
+    c="teal",
+    marker="o",
+    s=50,
+    alpha=0.8,
+)
+
+ax.plot(
+    x_coords,
+    y_coords,
+    z_coords,
+    color="gray",
+    linewidth=1,
+    alpha=0.5,
+)
+
+ax.set_title("1AKI: C-Alpha Backbone Point Cloud", fontsize=14)
+ax.set_xlabel("X (Å)")
+ax.set_ylabel("Y (Å)")
+ax.set_zlabel("Z (Å)")
+
+plt.show()
