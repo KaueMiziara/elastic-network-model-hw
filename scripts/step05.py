@@ -1,22 +1,44 @@
+from Bio.PDB.MMCIFParser import MMCIFParser
+from Bio.PDB.PDBParser import PDBParser
 import numpy as np
 
 # Step 1
 
-coordinates = []
 
-with open("data/1AKI.pdb", "r") as file:
-    for line in file:
-        if line.startswith("ATOM"):
-            atom_name = line[12:16].strip()
+def extract_calpha_matrix(filepath: str, structure_id="prot"):
+    """
+    Parses a PDB or mmCIF file and returns a NumPy array of C-alpha coordinates.
+    """
+    if filepath.endswith(".cif"):
+        parser = MMCIFParser(QUIET=True)
+    elif filepath.endswith(".pdb"):
+        parser = PDBParser(QUIET=True)
+    else:
+        raise ValueError("Unsupported file format. Please provide .pdb or .cif")
 
-            if atom_name == "CA":
-                x = float(line[30:38])
-                y = float(line[38:46])
-                z = float(line[46:54])
+    structure = parser.get_structure(structure_id, filepath)
 
-                coordinates.append([x, y, z])
+    if structure is None:
+        raise RuntimeError("Biopython parser returned a NoneType structure.")
 
-ca_matrix = np.array(coordinates)
+    coordinates = []
+
+    for residue in structure.get_residues():
+        if residue.id[0] == " ":
+            coords = residue["CA"].get_coord()
+            coordinates.append(coords)
+
+    if not coordinates:
+        raise ValueError(
+            f"Zero C-alpha atoms extracted from {filepath}. "
+            "Check if the file is a valid PDB/CIF and not an HTML document."
+        )
+
+    return np.array(coordinates)
+
+
+ca_matrix = extract_calpha_matrix("data/1AKI.cif")
+print(f"Extracted from mmCIF: {ca_matrix.shape}")
 
 # Step 2
 
